@@ -1,42 +1,19 @@
-#!/bin/bash
-# - script to perform the following:
-# - Checking status of the applications
-# - Print PID of running applications
-# - Exit if applications are still running after 60sec
+#!/usr/bin/env bash
 check_status () {
 echo "$HOME_DIR"
-n=1
-while [ $n -le 12 ]
-do
-#SSDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-sleep 5
-echo "Checking status"
 ps -ef | grep -v grep | grep "$HOME_DIR/SoloSync" --color
-if [ $? = 0 ]
+number="$(ps -ef | grep -v grep | grep "$HOME_DIR/SoloSync" --color | awk '{print $2}' | wc -l)"
+if [ "$number" -ge 2 ]
     then
         echo "-----------------------------------------------------------------------------"
-        echo "Application still running"
+        echo "Application started"
     else
         echo "-----------------------------------------------------------------------------"
-        echo "Application stopped"
+        echo "Application not started"
+		exit 87
         echo "End"
     exit
 fi
-n=$[$n+1]
-if [ $? = 0 ]
-    then
-       echo "Printing PID"
-       ps -ef | grep -v grep | grep ""$HOME_DIR"/SoloSync" --color | awk '{print $2}'
-    else
-       echo "-----------------------------------------------------------------------------"
-fi
-if [ $n = 12 ]
-   then
-       echo "-----------------------------------------------------------------------------"
-       echo "error encountered"
-    exit 87
-fi
-done
 }
 ###Script usage- for wrong flag entered
     usage ()  {
@@ -59,6 +36,7 @@ done
     esac
     done
    }
+   
 
 ################
 ###   MAIN   ###
