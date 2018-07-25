@@ -1,21 +1,15 @@
 #!/bin/bash
-
 ### Script for rolback up SSYNC
 ### Initial version - Nikhilesh
 ### backup failed version and deploy the previous working backup
   restore_safe_copies () {
     echo "Starting rollback process `date` "
     echo "------------------------------------------------------------------------------"
-    cd $HOME_DIR || exit 87
-        pwd
-        ls -l
-    if [ ! -d "backup" ]
-      then
-         failed "There is no backup directory "
-    fi
+    cd $BACKUP_DIR || exit 87
+    echo "$BACKUP_DIR"
 ## Printing Backup folder
     echo "Checking if backup file exists"
-    cd $HOME_DIR/backup || exit 87
+    cd $BACKUP_DIR || exit 87
        bkfiles=$(ls -d *${RUNID}*)
     if [ -z "$bkfiles" ]
         then
@@ -26,31 +20,41 @@
             echo "${bkfiles}"
             echo "Cleaning existing files"
             cd $HOME_DIR || exit 87
-            find * -maxdepth 0 -name 'backup' -prune -o -exec rm -rf '{}' ';'
+            echo "rm $HOME_DIR/*.jar"
+			rm $HOME_DIR/*.jar
+			if [ "$?" -gt "0" ]; then  echo "unable to remove old jar files" && exit 87; fi
+			echo "rm $HOME_DIR/*.sh"
+			rm $HOME_DIR/*.sh
+			if [ "$?" -gt "0" ]; then  echo "unable to remove old script files" && exit 87; fi
+			echo "rm -rf $HOME_DIR/config"
+			rm -rf $HOME_DIR/config
+			if [ "$?" -gt "0" ]; then  echo "unable to remove old config files" && exit 87; fi
     fi
 #Restore the backup
     echo "Copying backup to $HOME_DIR directory"
-    cp -r $HOME_DIR/backup/$bkfiles/* $HOME_DIR/
+    cp -r $BACKUP_DIR/$bkfiles/* $HOME_DIR/
+	echo "cp -r $BACKUP_DIR/$bkfiles/* $HOME_DIR/"
     [ $? -ne 0 ] && failed "Unable to copy backup"
 }
 
 ###Script usage- for wrong flag enetered
     usage ()  {
     echo "This scripts needs three flags with their values "
-    echo "Example of correct usage is  ./rollback.sh -r runid -d HOME_DIR"
+    echo "Example of correct usage is  ./rollback.sh -r runid -d HOME_DIR -b BACKUP_DIR"
     exit 87
 
 }
 
 ### Assigning variables
     set_environment  () {
-    echo "Checking and assigning varibales"
+    echo "Checking and assigning variables"
 
-    while getopts ":r:d:" opt
+    while getopts ":r:d:b:" opt
     do
         case "$opt" in
         r) RUNID="$OPTARG" ;;
         d) HOME_DIR="$OPTARG" ;;
+		b) BACKUP_DIR="$OPTARG" ;;
        \?) echo "Wrong flag "
              usage ;;
     esac
@@ -61,7 +65,7 @@
 ###   MAIN   ###
 ################
 
-    if [ $# -ne 4 ]; then
+    if [ $# -ne 6 ]; then
      usage
     fi
     echo "------------------------------------------------------------------------------"

@@ -8,17 +8,17 @@ echo "$HOME_DIR"
 n=1
 while [ $n -le 12 ]
 do
-#SSDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 sleep 5
 echo "Checking status"
-ps -ef | grep -v grep | grep "$HOME_DIR/SoloSync" --color
+echo "ps -ef | grep -v grep | grep "$HOME_DIR/SoloSyncEventManager" --color"
+ps -ef | grep -v grep | grep "$HOME_DIR/SoloSyncEventManager" --color
 if [ $? = 0 ]
     then
         echo "-----------------------------------------------------------------------------"
-        echo "Application still running"
+        echo "SoloSyncEventManager still running"
     else
         echo "-----------------------------------------------------------------------------"
-        echo "Application stopped"
+        echo "SoloSyncEventManager stopped"
         echo "End"
     exit
 fi
@@ -26,7 +26,7 @@ n=$[$n+1]
 if [ $? = 0 ]
     then
        echo "Printing PID"
-       ps -ef | grep -v grep | grep ""$HOME_DIR"/SoloSync" --color | awk '{print $2}'
+       ps -ef | grep -v grep | grep ""$HOME_DIR"/SoloSyncEventManager" --color | awk '{print $2}'
     else
        echo "-----------------------------------------------------------------------------"
 fi
@@ -41,7 +41,7 @@ done
 ###Script usage- for wrong flag entered
     usage ()  {
     echo "This script needs one flag with the value "
-    echo "Example of correct usage is  ./shutdown_status.sh -d HOME_DIR"
+    echo "Example of correct usage is  ./em_shutdown_status.sh -d HOME_DIR"
     exit 87
 
 }
